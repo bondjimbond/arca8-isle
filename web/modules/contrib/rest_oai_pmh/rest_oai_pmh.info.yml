@@ -1,0 +1,15 @@
+name: 'REST OAI-PMH'
+type: module
+description: 'Exposes entities as Dublin Core in an OAI-PMH endpoint using Views, REST, and a metadata mapping module of your choice'
+core: 8.x
+core_version_requirement: ^8 || ^9
+configure: rest_oai_pmh.rest_oai_pmh_settings_form
+package: 'Web services'
+dependencies:
+  - drupal:views
+  - drupal:rest
+
+# Information added by Drupal.org packaging script on 2020-11-06
+version: '8.x-1.0-beta2'
+project: 'rest_oai_pmh'
+datestamp: 1604676669
