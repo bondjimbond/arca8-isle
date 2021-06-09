@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\Component\Facet;
 
 use Solarium\Component\FacetSetInterface;
@@ -7,7 +14,7 @@ use Solarium\Component\FacetSetInterface;
 /**
  * Facet query.
  *
- * @see http://wiki.apache.org/solr/SimpleFacetParameters#Field_Value_Faceting_Parameters
+ * @see https://lucene.apache.org/solr/guide/json-facet-api.html#terms-facet
  */
 class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInterface
 {
@@ -48,7 +55,7 @@ class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInt
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return FacetSetInterface::JSON_FACET_TERMS;
     }
@@ -64,17 +71,19 @@ class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInt
      *
      * @return self Provides fluent interface
      */
-    public function setRefine(bool $refine)
+    public function setRefine(bool $refine): self
     {
-        return $this->setOption('refine', $refine);
+        $this->setOption('refine', $refine);
+
+        return $this;
     }
 
     /**
      * Get the refine parameter.
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getRefine()
+    public function getRefine(): ?bool
     {
         return $this->getOption('refine');
     }
@@ -88,17 +97,19 @@ class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInt
      *
      * @return self Provides fluent interface
      */
-    public function setOverRequest(int $overrequest)
+    public function setOverRequest(int $overrequest): self
     {
-        return $this->setOption('overrequest', $overrequest);
+        $this->setOption('overrequest', $overrequest);
+
+        return $this;
     }
 
     /**
      * Get the refine parameter.
      *
-     * @return int
+     * @return int|null
      */
-    public function getOverRequest()
+    public function getOverRequest(): ?int
     {
         return $this->getOption('overrequest');
     }
@@ -113,17 +124,19 @@ class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInt
      *
      * @return self Provides fluent interface
      */
-    public function setNumBuckets(bool $numBuckets)
+    public function setNumBuckets(bool $numBuckets): self
     {
-        return $this->setOption('numBuckets', $numBuckets);
+        $this->setOption('numBuckets', $numBuckets);
+
+        return $this;
     }
 
     /**
      * Get the numBuckets parameter.
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getNumBuckets()
+    public function getNumBuckets(): ?bool
     {
         return $this->getOption('numBuckets');
     }
@@ -139,17 +152,19 @@ class JsonTerms extends AbstractField implements JsonFacetInterface, FacetSetInt
      *
      * @return self Provides fluent interface
      */
-    public function setAllBuckets(bool $allBuckets)
+    public function setAllBuckets(bool $allBuckets): self
     {
-        return $this->setOption('allBuckets', $allBuckets);
+        $this->setOption('allBuckets', $allBuckets);
+
+        return $this;
     }
 
     /**
      * Get the allBuckets parameter.
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getAllBuckets()
+    public function getAllBuckets(): ?bool
     {
         return $this->getOption('allBuckets');
     }

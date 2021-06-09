@@ -5,7 +5,7 @@ namespace Drupal\Tests\search_api\Functional;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api\Item\Field;
@@ -14,8 +14,6 @@ use Drupal\search_api_test\PluginTestTrait;
 
 /**
  * Tests the admin UI for processors.
- *
- * @todo Move this whole class into a single IntegrationTest check*() method?
  *
  * @group search_api
  */
@@ -98,7 +96,12 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
    */
   public function testProcessorIntegration() {
     // Some processors are always enabled.
-    $enabled = ['add_url', 'aggregated_field', 'rendered_item'];
+    $enabled = [
+      'add_url',
+      'aggregated_field',
+      'language_with_fallback',
+      'rendered_item',
+    ];
     $actual_processors = array_keys($this->loadIndex()->getProcessors());
     sort($actual_processors);
     $this->assertEquals($enabled, $actual_processors);
@@ -109,6 +112,8 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
     foreach ($hidden as $processor_id) {
       $this->assertSession()->responseNotContains(Html::escape($processor_id));
     }
+
+    $this->checkLanguageWithFallbackIntegration();
 
     $this->checkAggregatedFieldsIntegration();
 
@@ -262,7 +267,7 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
     // After disabling some datasource, all related processors should be
     // disabled also.
     $this->drupalGet('admin/config/search/search-api/index/' . $this->indexId . '/edit');
-    $this->drupalPostForm(NULL, ['datasources[entity:user]' => FALSE], 'Save');
+    $this->submitForm(['datasources[entity:user]' => FALSE], 'Save');
     $processors = $this->loadIndex()->getProcessors();
     $this->assertArrayNotHasKey('role_filter', $processors);
     $this->drupalGet('admin/config/search/search-api/index/' . $this->indexId . '/processors');
@@ -304,13 +309,36 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
     $this->drupalGet($settings_path);
     $this->submitForm(['server' => 'webtest_server'], 'Save');
 
-    // Load the processors again and check that they are not shown anymore.
+    // Load the processors again and check that they are disabled now.
     $this->loadProcessorsTab();
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains('Highlight');
-    $this->assertSession()->pageTextNotContains('Ignore character');
-    $this->assertSession()->pageTextNotContains('Tokenizer');
-    $this->assertSession()->pageTextNotContains('Stopwords');
+    $this->assertSession()->pageTextContains('It is recommended not to use this processor with the selected server.');
+    $this->assertSession()->elementExists('css', 'input[name="status[highlight]"][disabled="disabled"]');
+    $this->assertSession()->elementExists('css', 'input[name="status[ignore_character]"][disabled="disabled"]');
+    $this->assertSession()->elementExists('css', 'input[name="status[tokenizer]"][disabled="disabled"]');
+    $this->assertSession()->elementExists('css', 'input[name="status[stopwords]"][disabled="disabled"]');
+  }
+
+  /**
+   * Tests the integration of the "Language (with fallback)" processor.
+   */
+  protected function checkLanguageWithFallbackIntegration() {
+    // Test that the processor is locked.
+    $index = $this->loadIndex();
+    $index->removeProcessor('language_with_fallback');
+    $index->save();
+
+    $this->assertTrue($this->loadIndex()->isValidProcessor('language_with_fallback'), 'The "Language (with fallback)" processor cannot be disabled.');
+
+    // Add a language_with_fallback field.
+    $options['query']['datasource'] = '';
+    $this->drupalGet($this->getIndexPath('fields/add/nojs'), $options);
+    // See \Drupal\search_api\Tests\IntegrationTest::addField().
+    $this->assertSession()->responseContains('name="language_with_fallback"');
+    $this->submitForm([], 'language_with_fallback');
+
+    $args['%label'] = 'Language (with fallback)';
+    $this->assertSession()->responseContains(new FormattableMarkup('Field %label was added to the index.', $args));
   }
 
   /**
@@ -702,20 +730,16 @@ TAGS
    *   actual configuration prior to comparing with the given configuration.
    */
   protected function editSettingsForm(array $configuration, $processor_id, array $form_values = NULL, $enable = TRUE, $unset_fields = TRUE) {
-    if (!isset($form_values)) {
-      $form_values = $configuration;
-    }
-
     $this->loadProcessorsTab();
 
-    $edit = $this->getFormValues($form_values, "processors[$processor_id][settings]");
+    $edit = $this->getFormValues($form_values ?? $configuration, "processors[$processor_id][settings]");
     if ($enable) {
       $edit["status[$processor_id]"] = 1;
     }
     $this->submitForm($edit, 'Save');
 
     $processor = $this->loadIndex()->getProcessor($processor_id);
-    $this->assertTrue($processor, "Successfully enabled the '$processor_id' processor.'");
+    $this->assertInstanceOf(ProcessorInterface::class, $processor, "Successfully enabled the '$processor_id' processor.'");
     if ($processor) {
       $actual_configuration = $processor->getConfiguration();
       unset($actual_configuration['weights']);

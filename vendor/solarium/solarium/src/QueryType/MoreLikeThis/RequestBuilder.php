@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\QueryType\MoreLikeThis;
 
 use Solarium\Core\Client\Request;
+use Solarium\Core\Query\AbstractQuery;
 use Solarium\Core\Query\QueryInterface;
 use Solarium\QueryType\Select\RequestBuilder as SelectRequestBuilder;
 
@@ -18,11 +26,11 @@ class RequestBuilder extends SelectRequestBuilder
      *
      * @return Request
      */
-    public function build(QueryInterface $query)
+    public function build(AbstractQuery $query): Request
     {
         $request = parent::build($query);
 
-        // add mlt params to request
+        // add MLT params to request
         $request->addParam('mlt.interestingTerms', $query->getInterestingTerms());
         $request->addParam('mlt.match.include', $query->getMatchInclude());
         $request->addParam('mlt.match.offset', $query->getMatchOffset());
@@ -38,10 +46,12 @@ class RequestBuilder extends SelectRequestBuilder
 
         // convert query to stream if necessary
         if (true === $query->getQueryStream()) {
+            $charset = $request->getParam('ie') ?? 'utf-8';
+
             $request->removeParam('q');
             $request->setRawData($query->getQuery());
             $request->setMethod(Request::METHOD_POST);
-            $request->addHeader('Content-Type: text/plain; charset=utf-8');
+            $request->addHeader('Content-Type: text/plain; charset='.$charset);
         }
 
         return $request;

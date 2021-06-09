@@ -1,9 +1,28 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\Component;
 
 use Solarium\Component\Facet\FacetInterface;
+use Solarium\Component\Facet\Field;
+use Solarium\Component\Facet\Interval;
+use Solarium\Component\Facet\JsonAggregation;
+use Solarium\Component\Facet\JsonQuery;
+use Solarium\Component\Facet\JsonRange;
+use Solarium\Component\Facet\JsonTerms;
+use Solarium\Component\Facet\MultiQuery;
+use Solarium\Component\Facet\Pivot;
+use Solarium\Component\Facet\Query;
+use Solarium\Component\Facet\Range;
+use Solarium\Component\RequestBuilder\ComponentRequestBuilderInterface;
 use Solarium\Component\RequestBuilder\FacetSet as RequestBuilder;
+use Solarium\Component\ResponseParser\ComponentParserInterface;
 use Solarium\Component\ResponseParser\FacetSet as ResponseParser;
 
 /**
@@ -19,31 +38,24 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      * @var array
      */
     protected $facetTypes = [
-        FacetSetInterface::FACET_FIELD => 'Solarium\Component\Facet\Field',
-        FacetSetInterface::FACET_QUERY => 'Solarium\Component\Facet\Query',
-        FacetSetInterface::FACET_MULTIQUERY => 'Solarium\Component\Facet\MultiQuery',
-        FacetSetInterface::FACET_RANGE => 'Solarium\Component\Facet\Range',
-        FacetSetInterface::FACET_PIVOT => 'Solarium\Component\Facet\Pivot',
-        FacetSetInterface::FACET_INTERVAL => 'Solarium\Component\Facet\Interval',
-        FacetSetInterface::JSON_FACET_AGGREGATION => 'Solarium\Component\Facet\JsonAggregation',
-        FacetSetInterface::JSON_FACET_TERMS => 'Solarium\Component\Facet\JsonTerms',
-        FacetSetInterface::JSON_FACET_QUERY => 'Solarium\Component\Facet\JsonQuery',
-        FacetSetInterface::JSON_FACET_RANGE => 'Solarium\Component\Facet\JsonRange',
+        FacetSetInterface::FACET_FIELD => Field::class,
+        FacetSetInterface::FACET_QUERY => Query::class,
+        FacetSetInterface::FACET_MULTIQUERY => MultiQuery::class,
+        FacetSetInterface::FACET_RANGE => Range::class,
+        FacetSetInterface::FACET_PIVOT => Pivot::class,
+        FacetSetInterface::FACET_INTERVAL => Interval::class,
+        FacetSetInterface::JSON_FACET_AGGREGATION => JsonAggregation::class,
+        FacetSetInterface::JSON_FACET_TERMS => JsonTerms::class,
+        FacetSetInterface::JSON_FACET_QUERY => JsonQuery::class,
+        FacetSetInterface::JSON_FACET_RANGE => JsonRange::class,
     ];
-
-    /**
-     * Facets.
-     *
-     * @var FacetInterface[]
-     */
-    protected $facets = [];
 
     /**
      * Get component type.
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return ComponentAwareQueryInterface::COMPONENT_FACETSET;
     }
@@ -53,7 +65,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return RequestBuilder
      */
-    public function getRequestBuilder()
+    public function getRequestBuilder(): ComponentRequestBuilderInterface
     {
         return new RequestBuilder();
     }
@@ -63,7 +75,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return ResponseParser
      */
-    public function getResponseParser()
+    public function getResponseParser(): ?ComponentParserInterface
     {
         return new ResponseParser();
     }
@@ -76,17 +88,19 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setExtractFromResponse($extract)
+    public function setExtractFromResponse(bool $extract): self
     {
-        return $this->setOption('extractfromresponse', $extract);
+        $this->setOption('extractfromresponse', $extract);
+
+        return $this;
     }
 
     /**
      * Get the extractfromresponse option value.
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getExtractFromResponse()
+    public function getExtractFromResponse(): ?bool
     {
         return $this->getOption('extractfromresponse');
     }
@@ -100,9 +114,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setPrefix($prefix)
+    public function setPrefix(string $prefix): self
     {
-        return $this->setOption('prefix', $prefix);
+        $this->setOption('prefix', $prefix);
+
+        return $this;
     }
 
     /**
@@ -110,9 +126,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return string
+     * @return string|null
      */
-    public function getPrefix()
+    public function getPrefix(): ?string
     {
         return $this->getOption('prefix');
     }
@@ -126,9 +142,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setContains($contains)
+    public function setContains(string $contains): self
     {
-        return $this->setOption('contains', $contains);
+        $this->setOption('contains', $contains);
+
+        return $this;
     }
 
     /**
@@ -136,9 +154,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return string
+     * @return string|null
      */
-    public function getContains()
+    public function getContains(): ?string
     {
         return $this->getOption('contains');
     }
@@ -152,9 +170,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setContainsIgnoreCase($containsIgnoreCase)
+    public function setContainsIgnoreCase(bool $containsIgnoreCase): self
     {
-        return $this->setOption('containsignorecase', $containsIgnoreCase);
+        $this->setOption('containsignorecase', $containsIgnoreCase);
+
+        return $this;
     }
 
     /**
@@ -162,11 +182,69 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getContainsIgnoreCase()
+    public function getContainsIgnoreCase(): ?bool
     {
         return $this->getOption('containsignorecase');
+    }
+
+    /**
+     * Limit facet terms to those matching this regular expression. Since Solr 7.2.
+     *
+     * This is a global value for all facets in this facetset
+     * It is overriden by an individual field's matches value
+     *
+     * @param string $matches
+     *
+     * @return self Provides fluent interface
+     */
+    public function setMatches(string $matches): self
+    {
+        $this->setOption('matches', $matches);
+
+        return $this;
+    }
+
+    /**
+     * Get the regular expression string that facets must match.
+     *
+     * This is a global value for all facets in this facetset
+     *
+     * @return string|null
+     */
+    public function getMatches(): ?string
+    {
+        return $this->getOption('matches');
+    }
+
+    /**
+     * Exclude these terms, comma separated list. Use \, for literal comma. Since Solr 6.5.
+     *
+     * This is a global value for all facets in this facetset
+     * It is overriden by an individual field's excludeTerms list
+     *
+     * @param string $exclude
+     *
+     * @return self Provides fluent interface
+     */
+    public function setExcludeTerms(string $exclude): self
+    {
+        $this->setOption('excludeTerms', $exclude);
+
+        return $this;
+    }
+
+    /**
+     * Get terms that should be excluded from the facet.
+     *
+     * This is a global value for all facets in this facetset
+     *
+     * @return string|null
+     */
+    public function getExcludeTerms(): ?string
+    {
+        return $this->getOption('excludeTerms');
     }
 
     /**
@@ -180,9 +258,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setSort($sort)
+    public function setSort(string $sort): self
     {
-        return $this->setOption('sort', $sort);
+        $this->setOption('sort', $sort);
+
+        return $this;
     }
 
     /**
@@ -190,9 +270,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return string
+     * @return string|null
      */
-    public function getSort()
+    public function getSort(): ?string
     {
         return $this->getOption('sort');
     }
@@ -200,15 +280,17 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
     /**
      * Set the facet limit.
      *
-     *  This is a global value for all facets in this facetset
+     * This is a global value for all facets in this facetset
      *
      * @param int $limit
      *
      * @return self Provides fluent interface
      */
-    public function setLimit($limit)
+    public function setLimit(int $limit): self
     {
-        return $this->setOption('limit', $limit);
+        $this->setOption('limit', $limit);
+
+        return $this;
     }
 
     /**
@@ -216,9 +298,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return string
+     * @return int|null
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->getOption('limit');
     }
@@ -232,9 +314,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setMinCount($minCount)
+    public function setMinCount(int $minCount): self
     {
-        return $this->setOption('mincount', $minCount);
+        $this->setOption('mincount', $minCount);
+
+        return $this;
     }
 
     /**
@@ -242,9 +326,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return int
+     * @return int|null
      */
-    public function getMinCount()
+    public function getMinCount(): ?int
     {
         return $this->getOption('mincount');
     }
@@ -258,9 +342,11 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return self Provides fluent interface
      */
-    public function setMissing($missing)
+    public function setMissing(bool $missing): self
     {
-        return $this->setOption('missing', $missing);
+        $this->setOption('missing', $missing);
+
+        return $this;
     }
 
     /**
@@ -268,9 +354,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * This is a global value for all facets in this facetset
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getMissing()
+    public function getMissing(): ?bool
     {
         return $this->getOption('missing');
     }
@@ -281,9 +367,9 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      * @param mixed $options
      * @param bool  $add
      *
-     * @return \Solarium\Component\Facet\Field
+     * @return \Solarium\Component\Facet\Field|FacetInterface
      */
-    public function createFacetField($options = null, $add = true)
+    public function createFacetField($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_FIELD, $options, $add);
     }
@@ -296,7 +382,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\Query
      */
-    public function createFacetQuery($options = null, $add = true)
+    public function createFacetQuery($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_QUERY, $options, $add);
     }
@@ -309,7 +395,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\MultiQuery
      */
-    public function createFacetMultiQuery($options = null, $add = true)
+    public function createFacetMultiQuery($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_MULTIQUERY, $options, $add);
     }
@@ -322,7 +408,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\Range
      */
-    public function createFacetRange($options = null, $add = true)
+    public function createFacetRange($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_RANGE, $options, $add);
     }
@@ -335,7 +421,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\Pivot
      */
-    public function createFacetPivot($options = null, $add = true)
+    public function createFacetPivot($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_PIVOT, $options, $add);
     }
@@ -348,7 +434,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\Interval
      */
-    public function createFacetInterval($options = null, $add = true)
+    public function createFacetInterval($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::FACET_INTERVAL, $options, $add);
     }
@@ -361,7 +447,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\JsonAggregation
      */
-    public function createJsonFacetAggregation($options = null, $add = true)
+    public function createJsonFacetAggregation($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::JSON_FACET_AGGREGATION, $options, $add);
     }
@@ -374,7 +460,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\JsonTerms
      */
-    public function createJsonFacetTerms($options = null, $add = true)
+    public function createJsonFacetTerms($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::JSON_FACET_TERMS, $options, $add);
     }
@@ -387,7 +473,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\JsonQuery
      */
-    public function createJsonFacetQuery($options = null, $add = true)
+    public function createJsonFacetQuery($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::JSON_FACET_QUERY, $options, $add);
     }
@@ -400,7 +486,7 @@ class FacetSet extends AbstractComponent implements FacetSetInterface
      *
      * @return \Solarium\Component\Facet\JsonRange
      */
-    public function createJsonFacetRange($options = null, $add = true)
+    public function createJsonFacetRange($options = null, bool $add = true): FacetInterface
     {
         return $this->createFacet(FacetSetInterface::JSON_FACET_RANGE, $options, $add);
     }

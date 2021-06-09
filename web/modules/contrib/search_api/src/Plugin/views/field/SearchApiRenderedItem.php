@@ -4,7 +4,6 @@ namespace Drupal\search_api\Plugin\views\field;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\search_api\LoggerTrait;
 use Drupal\search_api\Plugin\views\query\SearchApiQuery;
 use Drupal\search_api\SearchApiException;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -22,7 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SearchApiRenderedItem extends FieldPluginBase {
 
-  use LoggerTrait;
   use SearchApiFieldTrait;
 
   /**
@@ -114,7 +112,7 @@ class SearchApiRenderedItem extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query($use_groupby = FALSE) {
     $this->addRetrievedProperty('_object');
   }
 
@@ -122,7 +120,7 @@ class SearchApiRenderedItem extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function render(ResultRow $row) {
-    if (!(isset($row->_object) && $row->_object instanceof ComplexDataInterface)) {
+    if (!(($row->_object ?? NULL) instanceof ComplexDataInterface)) {
       $context = [
         '%item_id' => $row->search_api_id,
         '%view' => $this->view->storage->label(),
@@ -142,14 +140,17 @@ class SearchApiRenderedItem extends FieldPluginBase {
     }
     // Always use the default view mode if it was not set explicitly in the
     // options.
-    $view_mode = 'default';
     $bundle = $this->index->getDatasource($datasource_id)->getItemBundle($row->_object);
-    if (isset($this->options['view_modes'][$datasource_id][$bundle])) {
-      $view_mode = $this->options['view_modes'][$datasource_id][$bundle];
-    }
+    $view_mode = $this->options['view_modes'][$datasource_id][$bundle] ?? 'default';
 
     try {
-      return $this->index->getDatasource($datasource_id)->viewItem($row->_object, $view_mode);
+      $build = $this->index->getDatasource($datasource_id)
+        ->viewItem($row->_object, $view_mode);
+      if ($build) {
+        // Add the excerpt to the render array to allow adding it to view modes.
+        $render['#search_api_excerpt'] = $row->_item->getExcerpt();
+      }
+      return $build;
     }
     catch (SearchApiException $e) {
       $this->logException($e);

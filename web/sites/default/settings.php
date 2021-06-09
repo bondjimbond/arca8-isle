@@ -814,3 +814,6 @@ $databases['default']['default']['namespace'] = 'Drupal\\Core\\Database\\Driver\
 $settings['reverse_proxy_addresses'] = array (
   0 => '172.21.0.3',
 );
+$settings['reverse_proxy_addresses'] = array (
+  0 => '172.21.0.2',
+);

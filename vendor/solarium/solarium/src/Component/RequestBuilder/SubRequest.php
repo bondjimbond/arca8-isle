@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\Component\RequestBuilder;
 
 /**
@@ -10,12 +17,9 @@ class SubRequest implements RequestParamsInterface
     use RequestParamsTrait;
 
     /**
-     * Request params.
+     * Query parser.
      *
-     * Multivalue params are supported using a multidimensional array:
-     * 'fq' => array('cat:1','published:1')
-     *
-     * @var array
+     * @var string
      */
     protected $queryParser = 'rerank';
 
@@ -24,7 +28,7 @@ class SubRequest implements RequestParamsInterface
      *
      * @return string
      */
-    public function getQueryParser()
+    public function getQueryParser(): string
     {
         return $this->queryParser;
     }
@@ -36,7 +40,7 @@ class SubRequest implements RequestParamsInterface
      *
      * @return self Provides fluent interface
      */
-    public function setQueryParser(string $value)
+    public function setQueryParser(string $value): self
     {
         $this->queryParser = $value;
 
@@ -50,7 +54,7 @@ class SubRequest implements RequestParamsInterface
      *
      * @return string
      */
-    public function getSubQuery($separator = ' ')
+    public function getSubQuery(string $separator = ' '): string
     {
         $queryString = '';
         foreach ($this->getParams() as $key => $value) {

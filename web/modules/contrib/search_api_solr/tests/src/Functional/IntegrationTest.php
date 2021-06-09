@@ -4,15 +4,17 @@ namespace Drupal\Tests\search_api_solr\Functional;
 
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api_solr\Utility\SolrCommitTrait;
+use Drupal\Tests\search_api\Functional\IntegrationTest as SearchApiIntegrationTest;
 
 /**
  * Tests the overall functionality of the Search API framework and admin UI.
  *
  * @group search_api_solr
  */
-class IntegrationTest extends \Drupal\Tests\search_api\Functional\IntegrationTest {
+class IntegrationTest extends SearchApiIntegrationTest {
 
   use SolrCommitTrait;
+
   /**
    * The backend of the search server used for this test.
    *
@@ -31,11 +33,11 @@ class IntegrationTest extends \Drupal\Tests\search_api\Functional\IntegrationTes
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     if ($this->indexId) {
       if ($index = $this->getIndex()) {
         $index->clear();
-        $this->ensureCommit($index->getServerInstance());
+        $this->ensureCommit($index);
       }
     }
     parent::tearDown();
@@ -106,8 +108,8 @@ class IntegrationTest extends \Drupal\Tests\search_api\Functional\IntegrationTes
     $edit += [
       'backend_config[connector_config][host]' => 'localhost',
       'backend_config[connector_config][port]' => '8983',
-      'backend_config[connector_config][path]' => '/',
-      'backend_config[connector_config][core]' => '',
+      'backend_config[connector_config][path]' => '/foo',
+      'backend_config[connector_config][core]' => 'bar',
     ];
     $this->submitForm($edit, 'Save');
 
@@ -121,8 +123,8 @@ class IntegrationTest extends \Drupal\Tests\search_api\Functional\IntegrationTes
     $edit = [
       'backend_config[connector_config][host]' => 'localhost',
       'backend_config[connector_config][port]' => '8983',
-      'backend_config[connector_config][path]' => '/solr',
-      'backend_config[connector_config][core]' => 'd8',
+      'backend_config[connector_config][path]' => '/',
+      'backend_config[connector_config][core]' => 'drupal',
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The Solr server could be reached.');
@@ -139,7 +141,7 @@ class IntegrationTest extends \Drupal\Tests\search_api\Functional\IntegrationTes
   protected function indexItems() {
     $index_status = parent::indexItems();
     $index = Index::load($this->indexId);
-    $this->ensureCommit($index->getServerInstance());
+    $this->ensureCommit($index);
     return $index_status;
   }
 

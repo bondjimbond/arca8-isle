@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\Component\Result\Debug;
 
 /**
@@ -40,7 +47,7 @@ class Detail
      * @param float  $value
      * @param string $description
      */
-    public function __construct($match, $value, $description)
+    public function __construct(bool $match, float $value, string $description)
     {
         $this->match = $match;
         $this->value = $value;
@@ -52,7 +59,7 @@ class Detail
      *
      * @return bool
      */
-    public function getMatch()
+    public function getMatch(): bool
     {
         return $this->match;
     }
@@ -62,7 +69,7 @@ class Detail
      *
      * @return float
      */
-    public function getValue()
+    public function getValue(): float
     {
         return $this->value;
     }
@@ -72,23 +79,27 @@ class Detail
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
      * @param array $subDetails
+     *
+     * @return self
      */
-    public function setSubDetails($subDetails)
+    public function setSubDetails(array $subDetails): self
     {
         $this->subDetails = $subDetails;
+
+        return $this;
     }
 
     /**
      * @return array
      */
-    public function getSubDetails()
+    public function getSubDetails(): array
     {
         return $this->subDetails;
     }

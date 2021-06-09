@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Solarium package.
+ *
+ * For the full copyright and license information, please view the COPYING
+ * file that was distributed with this source code.
+ */
+
 namespace Solarium\Component\Result\Stats;
 
 /**
@@ -27,7 +34,7 @@ class Result
      * @param string $field
      * @param array  $stats
      */
-    public function __construct($field, $stats)
+    public function __construct(string $field, array $stats)
     {
         $this->field = $field;
         $this->stats = $stats;
@@ -36,9 +43,9 @@ class Result
     /**
      * Get field name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->field;
     }
@@ -46,9 +53,9 @@ class Result
     /**
      * Get min value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getMin()
+    public function getMin(): ?string
     {
         return $this->getValue('min');
     }
@@ -56,9 +63,9 @@ class Result
     /**
      * Get max value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getMax()
+    public function getMax(): ?string
     {
         return $this->getValue('max');
     }
@@ -66,9 +73,9 @@ class Result
     /**
      * Get sum value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getSum()
+    public function getSum(): ?string
     {
         return $this->getValue('sum');
     }
@@ -76,19 +83,19 @@ class Result
     /**
      * Get count value.
      *
-     * @return string
+     * @return int|null
      */
-    public function getCount()
+    public function getCount(): ?int
     {
-        return $this->getValue('count');
+        return (int) $this->getValue('count');
     }
 
     /**
      * Get missing value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getMissing()
+    public function getMissing(): ?string
     {
         return $this->getValue('missing');
     }
@@ -96,9 +103,9 @@ class Result
     /**
      * Get sumOfSquares value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getSumOfSquares()
+    public function getSumOfSquares(): ?string
     {
         return $this->getValue('sumOfSquares');
     }
@@ -106,9 +113,9 @@ class Result
     /**
      * Get mean value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getMean()
+    public function getMean(): ?string
     {
         return $this->getValue('mean');
     }
@@ -116,9 +123,9 @@ class Result
     /**
      * Get stddev value.
      *
-     * @return string
+     * @return string|null
      */
-    public function getStddev()
+    public function getStddev(): ?string
     {
         return $this->getValue('stddev');
     }
@@ -126,9 +133,9 @@ class Result
     /**
      * Get facet stats.
      *
-     * @return array
+     * @return array|null
      */
-    public function getFacets()
+    public function getFacets(): ?array
     {
         return $this->getValue('facets');
     }
@@ -136,9 +143,9 @@ class Result
     /**
      * Get percentile stats.
      *
-     * @return array
+     * @return array|null
      */
-    public function getPercentiles()
+    public function getPercentiles(): ?array
     {
         return $this->getValue('percentiles');
     }
@@ -148,10 +155,10 @@ class Result
      *
      * @param mixed $name
      *
-     * @return string
+     * @return string|array|null
      */
     protected function getValue($name)
     {
-        return isset($this->stats[$name]) ? $this->stats[$name] : null;
+        return $this->stats[$name] ?? null;
     }
 }
